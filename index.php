@@ -1,7 +1,6 @@
 <?php
 
 use App\Controllers\ApartmentControllers;
-use App\Controllers\PageControllers;
 use App\Controllers\ReviewControllers;
 use App\Controllers\UserControllers;
 use App\Redirect;
@@ -17,9 +16,6 @@ require_once 'vendor/autoload.php';
 session_start();
 
 $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
-    $r->addRoute('GET', '/', [PageControllers::class, 'main']);
-
-
     $r->addRoute('GET', '/users/signUp', [UserControllers::class, 'signUp']);
     $r->addRoute('POST', '/users/register', [UserControllers::class, 'register']);
 
@@ -30,7 +26,7 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     $r->addRoute('GET', '/logout', [UserControllers::class, 'logout']);
 
 
-    $r->addRoute('GET', '/apartments', [ApartmentControllers::class, 'index']);
+    $r->addRoute('GET', '/', [ApartmentControllers::class, 'index']);
     $r->addRoute('GET', '/apartments/{id:\d+}', [ApartmentControllers::class, 'show']);
 
     $r->addRoute('POST', '/apartments', [ApartmentControllers::class, 'store']);
@@ -44,6 +40,8 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     $r->addRoute('POST', '/apartments/{id:\d+}/reserve', [ApartmentControllers::class, 'reserve']);
 
     $r->addRoute('POST', '/apartments/{id:\d+}/rating', [ApartmentControllers::class, 'ratings']);
+
+    $r->addRoute('POST', '/apartments/{id:\d+}/count', [ApartmentControllers::class, 'countMoney']);
 
 
     $r->addRoute('POST', '/apartments/{id:\d+}/addReview', [ReviewControllers::class, 'addReview']);
@@ -96,3 +94,6 @@ switch ($routeInfo[0]) {
 if(isset($_SESSION["inputs"])){
     unset($_SESSION["inputs"]);
 }
+$_SESSION['price'] = 0;
+
+

@@ -64,7 +64,7 @@ class ReviewControllers
     {
         Database::connection()
             ->delete('reviews', ['id' => (int)$input['id']]);
-        return new Redirect('/apartments/' . $_SESSION['apartmentId']['id']);
+        return new Redirect('/apartments/' . $_SESSION['apartmentId']);
     }
 
 }

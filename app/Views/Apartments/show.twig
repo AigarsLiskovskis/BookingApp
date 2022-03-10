@@ -1,82 +1,119 @@
 {% extends "layout.twig" %}
 {% block content %}
-    <nav>
-        <h1>Apartment</h1>
-        <a href="/">Home</a> |
-        <a href="/apartments">Back</a> |
-        {% if authorized %}
-            <a href="/apartments/{{ apartment.id }}/edit">Edit apartment</a>
-            <br>  <br>
-            <form method="post" action="/apartments/{{ apartment.id }}/delete">
-                <button onclick="return confirm('Really Delete?')">Delete apartment</button>
+    <div class="container">
+        {% if apartment.userId == user %}
+            <form method="get" action="/apartments/{{ apartment.id }}/edit" style="display: inline;">
+                <button class="btn btn-primary">Edit apartment</button>
             </form>
-        {% else %}
-            <a href="/users/signUp">SIGN UP</a> |
-            <a href="/users">LOGIN</a>
+            <form method="post" action="/apartments/{{ apartment.id }}/delete" style="display: inline;">
+                <button class="btn btn-primary" onclick="return confirm('Delete?')">Delete apartment</button>
+            </form>
         {% endif %}
-        <br>
-    </nav>
-    <h3>Name: {{ apartment.name }}</h3>
-    <p>Address: {{ apartment.address }}</p>
-    <p>Description: {{ apartment.description }}</p>
-    <p>Available from: {{ apartment.availableFrom }}</p>
-    <p>Available till: {{ apartment.availableTill }}</p>
-    <p>
-        <small>
+        <div class="container">
+            <h3>{{ apartment.name }}</h3>
+            <table class="table">
+                <tbody>
+                <tr>
+                    <td>Address:</td>
+                    <td>{{ apartment.address }}</td>
+                </tr>
+                <tr>
+                    <td>Available from:</td>
+                    <td>{{ apartment.availableFrom }}</td>
+                </tr>
+                <tr>
+                    <td>Available till:</td>
+                    <td>{{ apartment.availableTill }}</td>
+                </tr>
+                <tr>
+                    <td>Description:</td>
+                    <td>{{ apartment.description }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="container">
             Owner: {{ ownerName }}
-            <br>
+        </div>
+        <div class="container">
             Rating: {{ rating }}
-        </small>
-    </p>
-    {% for reservation in reservations %}
-        <li>
-            Reserved from: {{ reservation.reserved_from }} to: {{ reservation.reserved_till }}
-        </li>
-    {% endfor %}
-    <form method="post" action="/apartments/{{ apartment.id }}/reserve" h>
-        <label for="startDate">Reserve from</label>
-        <input type="date" id="startDate" name="startDate"
-               min="{{ apartment.availableFrom }}"
-               max="{{ apartment.availableTill }}"
-               style="margin: 10px" required>
-        <label for="endDate">to</label>
-        <input type="date" id="endDate" name="endDate"
-               min="{{ apartment.availableFrom }}"
-               max="{{ apartment.availableTill }}"
-               style="margin: 10px" required>
-        <input type="submit" value="Reserve">
+        </div>
         <br>
-    </form>
-    {% if  rateButtons %}
-        <form method="post" action="/apartments/{{ apartment.id }}/rating" h>
-            <label for="rate">Rate this Apartment from 1 to 5</label>
-            <input type="range" id="rate" name="rate" min="0" max="5" style="margin: 10px" required>
-            <input type="submit" value="Add rating">
-            <br>
-        </form>
-    {% endif %}
-
-    <br><br>
-    <ul>
-        {% for review in reviews %}
-            <li>
-                <p>{{ review.review }}</p>
-                Created at: {{ review.createdAt }} by: {{ review.createdBy }}
-                {% if review.userId == user %}
-                    <form method="post" action="/reviews/{{ review.id }}/delete">
-                        <button onclick="return confirm('Really Delete?')">X</button>
-                    </form>
-                {% endif %}
-            </li>
-        {% endfor %}
-    </ul>
-
-    {% if authorized %}
-        <form method="post" action="/apartments/{{ apartment.id }}/addReview">
-            <label for="review">Write review</label>
-            <textarea id="review" name="review" rows="3" cols="40" required></textarea> <br><br>
-            <input type="submit" value="Add review">
-        </form>
-    {% endif %}
-    <br><br>
+        <div class="container">
+            {% for reservation in reservations %}
+                <li>
+                    Reserved from: {{ reservation.reserved_from }} to: {{ reservation.reserved_till }}
+                </li>
+            {% endfor %}
+        </div>
+        <div class="container">
+            <form method="post" action="/apartments/{{ apartment.id }}/count">
+                <label for="startDate">Reserve from</label>
+                <input type="date" id="startDate" name="startDate"
+                       min="{{ apartment.availableFrom }}"
+                       max="{{ apartment.availableTill }}"
+                       style="margin: 10px" required>
+                <label for="endDate">to</label>
+                <input type="date" id="endDate" name="endDate"
+                       min="{{ apartment.availableFrom }}"
+                       max="{{ apartment.availableTill }}"
+                       style="margin: 10px" required>
+                <input type="submit" value="Calculate">
+                <br>
+            </form>
+        </div>
+        <div class="container">Your price is: {{ price }} EUR.</div>
+        <br>
+        <div class="container">
+            <form method="post" action="/apartments/{{ apartment.id }}/reserve">
+                <button class="btn btn-primary">Reserve</button>
+            </form>
+        </div>
+        <div class="container">
+            {% if  rateButtons %}
+                <form method="post" action="/apartments/{{ apartment.id }}/rating" h>
+                    <label for="rate">Rate this Apartment from 1 to 5</label>
+                    <input type="range" id="rate" name="rate" min="0" max="5" style="margin: 10px" required>
+                    <input type="submit" value="Add rating">
+                    <br>
+                </form>
+            {% endif %}
+        </div>
+        <br>
+        <div class="container">
+            <h3>Reviews and Comments</h3>
+            <ul>
+                {% for review in reviews %}
+                    <div class="container"
+                         style="width: 600px;  border: 2px solid gray; border-radius: 8px; padding: 5px; margin: 5px">
+                        <li>
+                            <div class=container">
+                                {{ review.review }}
+                            </div>
+                            Created at: {{ review.createdAt }} by: {{ review.createdBy }}
+                            <br>
+                            {% if review.userId == user %}
+                                <form method="post" action="/reviews/{{ review.id }}/delete">
+                                    <button class="btn btn-primary" onclick="return confirm('Really Delete?')">X
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </li>
+                    </div>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="container">
+            {% if authorized %}
+                <form method="post" action="/apartments/{{ apartment.id }}/addReview">
+                    <div class="form-group">
+                        <label for="review">Write review</label>
+                        <textarea id="review" class="form-control" name="review" placeholder="Review" rows="3"
+                                  cols="20" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add review</button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}

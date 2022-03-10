@@ -33,6 +33,7 @@ class ApartmentControllers
                 $item['address'],
                 $item['description'],
                 $item['user_id'],
+                $item['price'],
                 $item['available_from'],
                 $item['available_till']
             );
@@ -42,7 +43,8 @@ class ApartmentControllers
             return new View('Apartments/index', [
                 'apartments' => $apartments,
                 'authorized' => true,
-                'userName' => $_SESSION['name']
+                'userName' => $_SESSION['name'],
+                'user' => $_SESSION['userid'],
             ]);
         } else {
             return new View('Apartments/index', [
@@ -72,9 +74,12 @@ class ApartmentControllers
             $apartmentQuery['address'],
             $apartmentQuery['description'],
             $apartmentQuery['user_id'],
+            $apartmentQuery['price'],
             $apartmentQuery['available_from'],
             $apartmentQuery['available_till']
         );
+
+        $_SESSION['apartmentId'] = $apartmentQuery['id'];
 
 
         $reserveQuery = Database::connection()
@@ -131,6 +136,7 @@ class ApartmentControllers
                 'rating' => $rating,
                 'reviews' => $reviews,
                 'userName' => $_SESSION['name'],
+                'price' => $_SESSION['price'],
                 'authorized' => true
             ]);
         } else {
@@ -139,6 +145,7 @@ class ApartmentControllers
                 'ownerName' => $ownerName,
                 'rating' => $rating,
                 'reviews' => $reviews,
+                'price' => $_SESSION['price'],
             ]);
         }
     }
@@ -146,7 +153,8 @@ class ApartmentControllers
     public function create(): View
     {
         return new View('Apartments/create', [
-            'userName' => $_SESSION['name']
+            'userName' => $_SESSION['name'],
+            'authorized' => true,
         ]);
     }
 
@@ -162,6 +170,7 @@ class ApartmentControllers
                 'address' => $_POST['address'],
                 'description' => trim($_POST['description']),
                 'user_id' => ($_SESSION["userid"]),
+                'price' => $_POST['price'],
                 'available_from' => $_POST['availableFrom'],
                 'available_till' => $_POST['availableTill']
             ]);
@@ -202,13 +211,15 @@ class ApartmentControllers
             $editQuery['address'],
             $editQuery['description'],
             $editQuery['user_id'],
+            $editQuery['price'],
             $editQuery['available_from'],
             $editQuery['available_till']
         );
 
         return new View('Apartments/update', [
             'apartment' => $apartment,
-            'userName' => $_SESSION['name']
+            'userName' => $_SESSION['name'],
+            'authorized' => true,
         ]);
 
     }
@@ -226,6 +237,7 @@ class ApartmentControllers
                     'address' => $_POST['address'],
                     'description' => $_POST['description'],
                     'user_id' => $_SESSION["userid"],
+                    'price' => $_POST['price'],
                     'available_from' => $_POST['availableFrom'],
                     'available_till' => $_POST['availableTill'],
                 ],
@@ -252,6 +264,34 @@ class ApartmentControllers
     /**
      * @throws Exception
      */
+    public function countMoney(array $input): Redirect
+    {
+        $reserveQuery = Database::connection()
+            ->createQueryBuilder()
+            ->select('price')
+            ->from('apartments')
+            ->where('id=?')
+            ->setParameter(0, (int)$input['id'])
+            ->executeQuery()
+            ->fetchAssociative();
+        $startTimeStamp = strtotime($_POST['startDate']);
+
+        $endTimeStamp = strtotime($_POST['endDate']);
+
+        $timeDiff = abs($endTimeStamp - $startTimeStamp);
+
+        $numberDays = $timeDiff / 86400;  // 86400 seconds in one day
+
+        $numberDays = intval($numberDays);
+
+        $_SESSION['price'] = $numberDays * $reserveQuery['price'];
+
+        return new Redirect('/apartments/' . $input['id']);
+    }
+
+    /**
+     * @throws Exception
+     */
     public function reserve(array $input): Redirect
     {
         $reserveQuery = Database::connection()
@@ -262,6 +302,7 @@ class ApartmentControllers
             ->setParameter(0, (int)$input['id'])
             ->executeQuery()
             ->fetchAllAssociative();
+
 
         if ($_POST['endDate'] < $_POST['startDate']) {
             return new Redirect('/apartments/' . $input['id']);

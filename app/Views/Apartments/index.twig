@@ -1,33 +1,20 @@
 {% extends "layout.twig" %}
 {% block content %}
-    <nav>
-        <h1>Apartments</h1>
-        <a href="/">Back</a> |
-        {% if authorized %}
-            <a href="/apartments/create">Add Apartment</a>
-        {% else %}
-            <a href="/users/signUp">SIGN UP</a> |
-            <a href="/users">LOGIN</a>
-        {% endif %}
-        <br><br>
-    </nav>
-    <ul id="navigation">
+    <div class="container">
         {% for apartment in apartments %}
-            <li>
-                <a href="/apartments/{{ apartment.id }}">
-                    {{ apartment.name }}
-                    <br>
-                    {{ apartment.address }}
-                    <br>
-                    {{ apartment.description }}
-                    <br>
-                    {{ apartment.availableFrom }}
-                    <br>
-                    {{ apartment.availableTill }}
-                </a>
-                <br><br>
-            </li>
+            <a href="/apartments/{{ apartment.id }}">
+                <div class="col-sm-4">
+                    <div class="panel panel-success">
+                        <div class="panel-heading">{{ apartment.name }}</div>
+                        <div class="panel-body">
+                            <div>Address: {{ apartment.address }}</div>
+                            <div>Available from: {{ apartment.availableFrom }}</div>
+                            <div>Available till: {{ apartment.availableTill }}</div>
+                        </div>
+                        <div class="panel-footer"></div>
+                    </div>
+                </div>
+            </a>
         {% endfor %}
-    </ul>
-    <br><br>
+    </div><br>
 {% endblock %}
