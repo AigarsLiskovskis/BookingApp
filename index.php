@@ -39,6 +39,7 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
 
     $r->addRoute('POST', '/apartments/{id:\d+}/reserve', [ApartmentControllers::class, 'reserve']);
 
+
     $r->addRoute('POST', '/apartments/{id:\d+}/rating', [ApartmentControllers::class, 'ratings']);
 
     $r->addRoute('POST', '/apartments/{id:\d+}/count', [ApartmentControllers::class, 'countMoney']);

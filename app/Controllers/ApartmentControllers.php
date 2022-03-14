@@ -9,6 +9,8 @@ use App\Models\Article;
 use App\Redirect;
 use App\Validation\Errors;
 use App\Views\View;
+use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Doctrine\DBAL\Exception;
 
 class ApartmentControllers
@@ -79,6 +81,8 @@ class ApartmentControllers
             $apartmentQuery['available_till']
         );
 
+        var_dump($apartmentQuery['available_from']);
+
         $_SESSION['apartmentId'] = $apartmentQuery['id'];
 
 
@@ -90,6 +94,20 @@ class ApartmentControllers
             ->setParameter(0, (int)$input['id'])
             ->executeQuery()
             ->fetchAllAssociative();
+
+        $reservations =[];
+        foreach ($reserveQuery as $record){
+            $startDate = $record['reserved_from'];
+            $endDate = $record['reserved_till'];
+
+            $period = CarbonPeriod::create($startDate,$endDate);
+            foreach ($period as $date)
+            {
+                $reservations[] =  $date->format('Y-m-d');
+            }
+        }
+
+
 
 
         $reviews = (new ReviewControllers())->showReviews($apartmentQuery['id']);
@@ -137,10 +155,12 @@ class ApartmentControllers
                 'reviews' => $reviews,
                 'userName' => $_SESSION['name'],
                 'price' => $_SESSION['price'],
+                'reservationDates' =>$reservations,
                 'authorized' => true
             ]);
         } else {
             return new View('Apartments/show', [
+                'reservationDates' =>$reservations,
                 'apartment' => $apartment,
                 'ownerName' => $ownerName,
                 'rating' => $rating,
@@ -260,6 +280,7 @@ class ApartmentControllers
                 ]);
         return new Redirect('/apartments/' . $input['id']);
     }
+
 
     /**
      * @throws Exception

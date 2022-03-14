@@ -37,45 +37,80 @@
         </div>
         <div class="container">
             Rating: {{ rating }}
+            <span class="fa fa-star checked"></span>
         </div>
         <br>
         <div class="container">
-            {% for reservation in reservations %}
                 <li>
-                    Reserved from: {{ reservation.reserved_from }} to: {{ reservation.reserved_till }}
+                    Open for reservations from: {{ apartment.availableFrom }} to: {{ apartment.availableTill }}
                 </li>
-            {% endfor %}
         </div>
         <div class="container">
             <form method="post" action="/apartments/{{ apartment.id }}/count">
                 <label for="startDate">Reserve from</label>
                 <input type="date" id="startDate" name="startDate"
-                       min="{{ apartment.availableFrom }}"
-                       max="{{ apartment.availableTill }}"
-                       style="margin: 10px" required>
+                       style="margin: 10px" required >
                 <label for="endDate">to</label>
                 <input type="date" id="endDate" name="endDate"
-                       min="{{ apartment.availableFrom }}"
-                       max="{{ apartment.availableTill }}"
-                       style="margin: 10px" required>
-                <input type="submit" value="Calculate">
+                       style="margin: 10px" required readonly>
+                <button type="submit">Calculate</button>
                 <br>
             </form>
         </div>
         <div class="container">Your price is: {{ price }} EUR.</div>
         <br>
-        <div class="container">
-            <form method="post" action="/apartments/{{ apartment.id }}/reserve">
-                <button class="btn btn-primary">Reserve</button>
-            </form>
-        </div>
+        {% if authorized %}
+            <div class="container">
+                <form method="post" action="/apartments/{{ apartment.id }}/reserve">
+                    <button class="btn btn-primary">Reserve</button>
+                </form>
+            </div>
+        {% endif %}
+        <br>
         <div class="container">
             {% if  rateButtons %}
                 <form method="post" action="/apartments/{{ apartment.id }}/rating" h>
                     <label for="rate">Rate this Apartment from 1 to 5</label>
-                    <input type="range" id="rate" name="rate" min="0" max="5" style="margin: 10px" required>
-                    <input type="submit" value="Add rating">
                     <br>
+
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-outline-secondary" value="1" name="rate">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 class="bi bi-star" viewBox="0 0 16 16">
+                                <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>
+                            </svg>
+                            <span class="visually-hidden"></span>
+                        </button>
+                        <button type="submit" class="btn btn-outline-secondary" value="2" name="rate">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 class="bi bi-star" viewBox="0 0 16 16">
+                                <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>
+                            </svg>
+                            <span class="visually-hidden"></span>
+                        </button>
+                        <button type="submit" class="btn btn-outline-secondary" value="3" name="rate">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 class="bi bi-star" viewBox="0 0 16 16">
+                                <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>
+                            </svg>
+                            <span class="visually-hidden"></span>
+                        </button>
+                        <button type="submit" class="btn btn-outline-secondary" value="4" name="rate">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 class="bi bi-star" viewBox="0 0 16 16">
+                                <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>
+                            </svg>
+                            <span class="visually-hidden"></span>
+                        </button>
+                        <button type="submit" class="btn btn-outline-secondary" value="5" name="rate">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 class="bi bi-star" viewBox="0 0 16 16">
+                                <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>
+                            </svg>
+                            <span class="visually-hidden"></span>
+                        </button>
+                    </div>
+
                 </form>
             {% endif %}
         </div>
@@ -116,4 +151,22 @@
             {% endif %}
         </div>
     </div>
+
+
+{% endblock %}
+{% block script %}
+    <script>
+        dates = {{ reservationDates|json_encode()|raw }};
+
+        $(function () {
+            $('input').datepicker({
+                dateFormat: 'yy-mm-dd',
+
+                beforeShowDay: function (date) {
+                    let string = jQuery.datepicker.formatDate('yy-mm-dd', date);
+                    return [dates.indexOf(string) === -1]
+                }
+            });
+        });
+    </script>
 {% endblock %}
