@@ -40,31 +40,35 @@
             <span class="fa fa-star checked"></span>
         </div>
         <br>
-        <div class="container">
-                <li>
-                    Open for reservations from: {{ apartment.availableFrom }} to: {{ apartment.availableTill }}
-                </li>
-        </div>
-        <div class="container">
-            <form method="post" action="/apartments/{{ apartment.id }}/count">
-                <label for="startDate">Reserve from</label>
-                <input type="date" id="startDate" name="startDate"
-                       style="margin: 10px" required >
-                <label for="endDate">to</label>
-                <input type="date" id="endDate" name="endDate"
-                       style="margin: 10px" required readonly>
-                <button type="submit">Calculate</button>
-                <br>
-            </form>
-        </div>
-        <div class="container">Your price is: {{ price }} EUR.</div>
-        <br>
         {% if authorized %}
             <div class="container">
                 <form method="post" action="/apartments/{{ apartment.id }}/reserve">
+                    <label for="startDate">Reserve from</label>
+                    <input type="date" id="startDate" name="startDate" min="{{ apartment.availableFrom }}"
+                           style="margin: 10px; width: 200px" required readonly>
+                    <label for="endDate">to</label>
+                    <input type="date" id="endDate" name="endDate" max="{{ apartment.availableTill }}"
+                           style="margin: 10px; width: 200px" required readonly>
                     <button class="btn btn-primary">Reserve</button>
                 </form>
             </div>
+            <div class="container">Your price is: {{ price }} EUR.</div>
+            <br>
+        {% else %}
+            <div class="container">
+                <form method="post" action="/apartments/{{ apartment.id }}/count">
+                    <label for="startDate">Reserve from</label>
+                    <input type="date" id="startDate" name="startDate" min="{{ apartment.availableFrom }}"
+                           style="margin: 10px; width: 200px" required readonly>
+                    <label for="endDate">to</label>
+                    <input type="date" id="endDate" name="endDate" max="{{ apartment.availableTill }}"
+                           style="margin: 10px; width: 200px" required readonly>
+                    <button type="submit">Calculate</button>
+                    <br>
+                </form>
+            </div>
+            <div class="container">Your price is: {{ price }} EUR.</div>
+            <br>
         {% endif %}
         <br>
         <div class="container">
@@ -158,7 +162,6 @@
     <script>
         dates = {{ reservationDates|json_encode()|raw }};
 
-        $(function () {
             $('input').datepicker({
                 dateFormat: 'yy-mm-dd',
 
@@ -167,6 +170,5 @@
                     return [dates.indexOf(string) === -1]
                 }
             });
-        });
     </script>
 {% endblock %}

@@ -1,7 +1,7 @@
 {% extends "layout.twig" %}
 {% block content %}
     <div class="container" style="width: 500px">
-        <form method="post" action="/apartments{{ apartment.id }}">
+        <form method="post" action="/apartments/{{ apartment.id }}">
             <div class="form-group">
                 <label for="Name">Name:</label>
                 <input type="text" class="form-control" id="Name" name="name" value="{{ apartment.name }}" required>
@@ -27,10 +27,10 @@
                        value="{{ apartment.availableTill }}" required>
             </div>
             <div class="form-group">
-                <label for="Price">Name:</label>
-                <input type="text" class="form-control" id="Price" name="Price" placeholder="Price" required>
+                <label for="price">Name:</label>
+                <input type="text" class="form-control" id="price" name="price" placeholder="price" required>
             </div>
-            <button type="submit" class="btn btn-primary">Add new Apartment</button>
+            <button type="submit" class="btn btn-primary">Edit</button>
         </form>
     </div>
 {% endblock %}

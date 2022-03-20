@@ -81,7 +81,7 @@ class ApartmentControllers
             $apartmentQuery['available_till']
         );
 
-        var_dump($apartmentQuery['available_from']);
+        //var_dump($apartmentQuery['available_from']);
 
         $_SESSION['apartmentId'] = $apartmentQuery['id'];
 
@@ -160,8 +160,8 @@ class ApartmentControllers
             ]);
         } else {
             return new View('Apartments/show', [
-                'reservationDates' =>$reservations,
                 'apartment' => $apartment,
+                'reservationDates' =>$reservations,
                 'ownerName' => $ownerName,
                 'rating' => $rating,
                 'reviews' => $reviews,
@@ -315,6 +315,7 @@ class ApartmentControllers
      */
     public function reserve(array $input): Redirect
     {
+        $this->countMoney($input);
         $reserveQuery = Database::connection()
             ->createQueryBuilder()
             ->select('reserved_from', 'reserved_till')
