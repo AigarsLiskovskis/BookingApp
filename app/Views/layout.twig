@@ -37,9 +37,9 @@
     </style>
 </head>
 <body>
-<div style="position: relative; min-height: 100vh">
+<div style="position: relative;  min-height: 100vh; background: #404040">
     <div style="padding-bottom: 2.5rem">
-        <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <nav class="navbar navbar-expand-sm bg-dark navbar-dark" style="position: sticky; top:0; z-index: 100">
             <div class="container">
                 <a href="/" class="navbar-brand">Booking App</a>
                 <div style="color: wheat">
@@ -70,29 +70,23 @@
             </div>
         </nav>
 
-        <div class="jumbotron" style="height: 200px">
-            <div class="container text-center">
+        <div class="jumbotron" style="height: 200px; background:#262626;">
+            <div class="container text-center" style="color:wheat" >
                 <h1>Book an Apartment</h1>
                 <p>Best Apartments in Your area</p>
             </div>
         </div>
 
-        <div id="content">{% block content %}{% endblock %}</div>
+        <div id="content" style="background:  #404040;">{% block content %}{% endblock %}</div>
 
         <footer class="container-fluid text-center" style="position: absolute;
-         bottom:0; width: 100%; height: 2.5rem">
+         bottom:0; width: 100%; height: 2.5rem; color: grey; background: #262626">
             <p> &copy; Copyright 2022 Booking App</p>
         </footer>
     </div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"
-        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-        crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"
-        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-        crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 {% block script %}{% endblock %}
 </body>
 </html>

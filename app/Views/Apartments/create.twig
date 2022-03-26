@@ -1,6 +1,6 @@
 {% extends "layout.twig" %}
 {% block content %}
-    <div class="container" style="width: 500px">
+    <div class="container" style="width: 500px; color: wheat">
         <form method="post" action="/apartments">
             <div class="form-group">
                 <label for="Name">Name:</label>
@@ -12,12 +12,15 @@
             </div>
             <div class="form-group">
                 <label for="description">Description:</label>
-                <textarea id="description" class="form-control" name="description" placeholder="Description" rows="3"
-                          cols="20" required></textarea>
+                <textarea id="description" class="form-control" name="description"
+                          placeholder="Description"
+                          rows="3"
+                          cols="20" required>
+                </textarea>
             </div>
             <div class="form-group">
                 <label for="availableFrom">Available From</label>
-                <input type="date" class="form-control" id="availableFrom" name="availableFrom" required>
+                <input type="date" class="form-control" id="availableFrom" name="availableFrom" min="now" required>
             </div>
             <div class="form-group">
                 <label for="availableTill">Available Till</label>

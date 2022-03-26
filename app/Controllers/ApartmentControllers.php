@@ -2,12 +2,33 @@
 
 namespace App\Controllers;
 
-use App\Database;
-use App\Exceptions\ResourceNotFoundException;
-use App\Models\Apartment;
-use App\Models\Article;
+
 use App\Redirect;
-use App\Validation\Errors;
+use App\Services\Apartment\CountMoney\GetPriceRequest;
+use App\Services\Apartment\CountMoney\GetPriceService;
+use App\Services\Apartment\Delete\DeleteApartmentRequest;
+use App\Services\Apartment\Delete\DeleteApartmentService;
+use App\Services\Apartment\Edit\EditApartmentRequest;
+use App\Services\Apartment\Edit\EditApartmentService;
+use App\Services\Apartment\Index\IndexApartmentService;
+use App\Services\Apartment\Ratings\AddRating\AddRatingRequest;
+use App\Services\Apartment\Ratings\AddRating\AddRatingService;
+use App\Services\Apartment\Ratings\ApartmentRating\ApartmentRatingRequest;
+use App\Services\Apartment\Ratings\ApartmentRating\ApartmentsRatingService;
+use App\Services\Apartment\Ratings\UserRated\UserRatedRequest;
+use App\Services\Apartment\Ratings\UserRated\UserRatedService;
+use App\Services\Apartment\Reservations\AddReservation\AddReservationRequest;
+use App\Services\Apartment\Reservations\AddReservation\AddReservationService;
+use App\Services\Apartment\Reservations\ShowReservations\ShowReservationRequest;
+use App\Services\Apartment\Reservations\ShowReservations\ShowReservationService;
+use App\Services\Apartment\Show\ShowApartmentRequest;
+use App\Services\Apartment\Show\ShowApartmentService;
+use App\Services\Apartment\Create\CreateApartmentRequest;
+use App\Services\Apartment\Create\CreateApartmentService;
+use App\Services\Apartment\Update\UpdateApartmentRequest;
+use App\Services\Apartment\Update\UpdateApartmentService;
+use App\Services\Users\Names\UserNamesRequest;
+use App\Services\Users\Names\UserNamesService;
 use App\Views\View;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
@@ -20,26 +41,8 @@ class ApartmentControllers
      */
     public function index(): View
     {
-        $query = Database::connection()
-            ->createQueryBuilder()
-            ->select('*')
-            ->from('apartments')
-            ->executeQuery()
-            ->fetchAllAssociative();
-
-        $apartments = [];
-        foreach ($query as $item) {
-            $apartments[] = new Apartment(
-                $item['id'],
-                $item['name'],
-                $item['address'],
-                $item['description'],
-                $item['user_id'],
-                $item['price'],
-                $item['available_from'],
-                $item['available_till']
-            );
-        }
+        $apartments = (new IndexApartmentService())
+            ->execute();
 
         if (SessionControllers::isAuthorized()) {
             return new View('Apartments/index', [
@@ -60,111 +63,59 @@ class ApartmentControllers
      */
     public function show(array $input): View
     {
-        $apartmentQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('*')
-            ->from('apartments')
-            ->where('id=?')
-            ->setParameter(0, (int)$input['id'])
-            ->executeQuery()
-            ->fetchAssociative();
+        $apartment = (new ShowApartmentService())
+            ->execute(new ShowApartmentRequest((int)$input['id']));
 
 
-        $apartment = new Apartment(
-            $apartmentQuery['id'],
-            $apartmentQuery['name'],
-            $apartmentQuery['address'],
-            $apartmentQuery['description'],
-            $apartmentQuery['user_id'],
-            $apartmentQuery['price'],
-            $apartmentQuery['available_from'],
-            $apartmentQuery['available_till']
-        );
-
-        //var_dump($apartmentQuery['available_from']);
-
-        $_SESSION['apartmentId'] = $apartmentQuery['id'];
+        $startDate = $apartment->getAvailableFrom();
+        $endDate = $apartment->getAvailableTill();
 
 
-        $reserveQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('reserved_from', 'reserved_till')
-            ->from('reservations')
-            ->where('apartment_id=?')
-            ->setParameter(0, (int)$input['id'])
-            ->executeQuery()
-            ->fetchAllAssociative();
-
-        $reservations =[];
-        foreach ($reserveQuery as $record){
-            $startDate = $record['reserved_from'];
-            $endDate = $record['reserved_till'];
-
-            $period = CarbonPeriod::create($startDate,$endDate);
-            foreach ($period as $date)
-            {
-                $reservations[] =  $date->format('Y-m-d');
-            }
-        }
+        $reservations = (new ShowReservationService())
+            ->execute(new ShowReservationRequest((int)$input['id']));
 
 
+        $ownerName = (new UserNamesService())
+            ->execute(new UserNamesRequest($apartment->getUserId()));
 
+        $rating = (new ApartmentsRatingService())
+            ->execute(new ApartmentRatingRequest($apartment->getId()));
 
-        $reviews = (new ReviewControllers())->showReviews($apartmentQuery['id']);
+        $reviews = (new ReviewControllers())->showReviews($apartment->getId());
 
-        $ownerQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('*')
-            ->from('users')
-            ->where('id =?')
-            ->setParameter(0, $apartmentQuery['user_id'])
-            ->executeQuery()
-            ->fetchAssociative();
-
-        $ownerName = $ownerQuery['name'] . ' ' . $ownerQuery['surname'];
-
-        $ratingQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('avg(rating)')
-            ->from('ratings')
-            ->where('apartment_id =?')
-            ->setParameter(0, $apartmentQuery['id'])
-            ->executeQuery()
-            ->fetchAssociative();
-
-        $rating = round($ratingQuery['avg(rating)']) ?? 0;
+        $_SESSION['apartmentId'] = $apartment->getId();
 
         if (SessionControllers::isAuthorized()) {
 
-            $rateQuery = Database::connection()
-                ->createQueryBuilder()
-                ->select('id')
-                ->from('ratings')
-                ->where("apartment_id = {$apartmentQuery['id']}")
-                ->andWhere("user_id = {$_SESSION['userid']}")
-                ->executeQuery()
-                ->fetchAssociative();
+            $userRated = (new UserRatedService())
+                ->execute(new UserRatedRequest(
+                    $apartment->getId(),
+                    $_SESSION['userid']
+                ));
 
             return new View('Apartments/show', [
                 'apartment' => $apartment,
-                'reservations' => $reserveQuery,
                 'user' => $_SESSION['userid'],
-                'rateButtons' => !$rateQuery,
+                'rateButtons' => $userRated,
                 'ownerName' => $ownerName,
                 'rating' => $rating,
                 'reviews' => $reviews,
                 'userName' => $_SESSION['name'],
                 'price' => $_SESSION['price'],
-                'reservationDates' =>$reservations,
+                'reservationDates' => $reservations,
+                'startDate' => $startDate,
+                'endDate' => $endDate,
                 'authorized' => true
             ]);
         } else {
             return new View('Apartments/show', [
                 'apartment' => $apartment,
-                'reservationDates' =>$reservations,
+                'reservationDates' => $reservations,
                 'ownerName' => $ownerName,
                 'rating' => $rating,
                 'reviews' => $reviews,
+                'startDate' => $startDate,
+                'endDate' => $endDate,
                 'price' => $_SESSION['price'],
             ]);
         }
@@ -178,123 +129,94 @@ class ApartmentControllers
         ]);
     }
 
-
     /**
      * @throws Exception
      */
     public function store(): Redirect
     {
-        Database::connection()
-            ->insert('apartments', [
-                'name' => $_POST['name'],
-                'address' => $_POST['address'],
-                'description' => trim($_POST['description']),
-                'user_id' => ($_SESSION["userid"]),
-                'price' => $_POST['price'],
-                'available_from' => $_POST['availableFrom'],
-                'available_till' => $_POST['availableTill']
-            ]);
-        return new Redirect('/apartments');
+        (new CreateApartmentService())
+            ->execute(new CreateApartmentRequest(
+                $_POST['name'],
+                $_POST['address'],
+                trim($_POST['description']),
+                $_SESSION["userid"],
+                $_POST['price'],
+                $_POST['availableFrom'],
+                $_POST['availableTill']
+            ));
+        return new Redirect('/');
 
     }
-
 
     /**
      * @throws Exception
      */
     public function delete(array $input): Redirect
     {
-        var_dump("hello");
-        Database::connection()
-            ->delete('apartments', ['id' => (int)$input['id']]);
-        return new Redirect('/apartments');
+        (new DeleteApartmentService())
+            ->execute(new DeleteApartmentRequest((int)$input['id']));
+        return new Redirect('/');
     }
-
 
     /**
      * @throws Exception
      */
     public function edit(array $input): View
     {
-        $editQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('*')
-            ->from('apartments')
-            ->where('id =?')
-            ->setParameter(0, $input['id'])
-            ->executeQuery()
-            ->fetchAssociative();
-
-        $apartment = new Apartment(
-            $editQuery['id'],
-            $editQuery['name'],
-            $editQuery['address'],
-            $editQuery['description'],
-            $editQuery['user_id'],
-            $editQuery['price'],
-            $editQuery['available_from'],
-            $editQuery['available_till']
-        );
+        $apartment = (new EditApartmentService())
+            ->execute(new EditApartmentRequest((int)$input['id']));
 
         return new View('Apartments/update', [
             'apartment' => $apartment,
             'userName' => $_SESSION['name'],
             'authorized' => true,
         ]);
-
     }
-
 
     /**
      * @throws Exception
      */
     public function update(array $input): Redirect
     {
-        Database::connection()
-            ->update('apartments',
-                [
-                    'name' => $_POST['name'],
-                    'address' => $_POST['address'],
-                    'description' => $_POST['description'],
-                    'user_id' => $_SESSION["userid"],
-                    'price' => $_POST['price'],
-                    'available_from' => $_POST['availableFrom'],
-                    'available_till' => $_POST['availableTill'],
-                ],
-                ['id' => (int)$input['id']]);
+        (new UpdateApartmentService())
+            ->execute(new UpdateApartmentRequest(
+                $_POST['name'],
+                $_POST['address'],
+                trim($_POST['description']),
+                $_SESSION["userid"],
+                $_POST['price'],
+                $_POST['availableFrom'],
+                $_POST['availableTill'],
+                (int)$input['id']
+            ));
         return new Redirect('/apartments/' . $input['id']);
     }
-
 
     /**
      * @throws Exception
      */
     public function ratings(array $input): Redirect
     {
-        Database::connection()
-            ->insert('ratings',
-                [
-                    'apartment_id' => (int)$input['id'],
-                    'user_id' => $_SESSION["userid"],
-                    'rating' => $_POST['rate']
-                ]);
+        (new AddRatingService())
+            ->execute(new AddRatingRequest(
+                (int)$input['id'],
+                $_SESSION["userid"],
+                $_POST['rate']
+            ));
+
         return new Redirect('/apartments/' . $input['id']);
     }
-
 
     /**
      * @throws Exception
      */
     public function countMoney(array $input): Redirect
     {
-        $reserveQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('price')
-            ->from('apartments')
-            ->where('id=?')
-            ->setParameter(0, (int)$input['id'])
-            ->executeQuery()
-            ->fetchAssociative();
+        $price = (new GetPriceService())
+            ->execute(new GetPriceRequest(
+                (int)$input['id']
+            ));
+
         $startTimeStamp = strtotime($_POST['startDate']);
 
         $endTimeStamp = strtotime($_POST['endDate']);
@@ -305,7 +227,7 @@ class ApartmentControllers
 
         $numberDays = intval($numberDays);
 
-        $_SESSION['price'] = $numberDays * $reserveQuery['price'];
+        $_SESSION['price'] = $numberDays * $price;
 
         return new Redirect('/apartments/' . $input['id']);
     }
@@ -316,35 +238,27 @@ class ApartmentControllers
     public function reserve(array $input): Redirect
     {
         $this->countMoney($input);
-        $reserveQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('reserved_from', 'reserved_till')
-            ->from('reservations')
-            ->where('apartment_id=?')
-            ->setParameter(0, (int)$input['id'])
-            ->executeQuery()
-            ->fetchAllAssociative();
-
-
         if ($_POST['endDate'] < $_POST['startDate']) {
             return new Redirect('/apartments/' . $input['id']);
         }
-        foreach ($reserveQuery as $reservation) {
-            if (($reservation["reserved_from"] <= $_POST['startDate']
-                    && $reservation['reserved_till'] >= $_POST['startDate']) ||
-                ($reservation["reserved_from"] <= $_POST['endDate']
-                    && $reservation['reserved_till'] >= $_POST['endDate'])) {
-                return new Redirect('/apartments/' . $input['id']);
-            }
-        }
-        Database::connection()
-            ->insert('reservations',
-                [
-                    'apartment_id' => (int)$input['id'],
-                    'user_id' => $_SESSION["userid"],
-                    'reserved_from' => $_POST['startDate'],
-                    'reserved_till' => $_POST['endDate']
-                ]);
+
+//        foreach ($reserveQuery as $reservation) {
+//            if (($reservation["reserved_from"] <= $_POST['startDate']
+//                    && $reservation['reserved_till'] >= $_POST['startDate']) ||
+//                ($reservation["reserved_from"] <= $_POST['endDate']
+//                    && $reservation['reserved_till'] >= $_POST['endDate'])) {
+//                return new Redirect('/apartments/' . $input['id']);
+//            }
+//        }
+
+        (new AddReservationService())
+            ->execute(new AddReservationRequest(
+                (int)$input['id'],
+                $_SESSION["userid"],
+                $_POST['startDate'],
+                $_POST['endDate']
+            ));
+
         return new Redirect('/apartments/' . $input['id']);
     }
 }

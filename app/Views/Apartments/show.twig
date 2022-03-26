@@ -1,6 +1,6 @@
 {% extends "layout.twig" %}
 {% block content %}
-    <div class="container">
+    <div class="container" style="color:whitesmoke;">
         {% if apartment.userId == user %}
             <form method="get" action="/apartments/{{ apartment.id }}/edit" style="display: inline;">
                 <button class="btn btn-primary">Edit apartment</button>
@@ -9,9 +9,9 @@
                 <button class="btn btn-primary" onclick="return confirm('Delete?')">Delete apartment</button>
             </form>
         {% endif %}
-        <div class="container">
+        <div class="container" >
             <h3>{{ apartment.name }}</h3>
-            <table class="table">
+            <table class="table" style="color:whitesmoke;">
                 <tbody>
                 <tr>
                     <td>Address:</td>
@@ -35,20 +35,21 @@
         <div class="container">
             Owner: {{ ownerName }}
         </div>
-        <div class="container">
+        <div class="container" >
             Rating: {{ rating }}
-            <span class="fa fa-star checked"></span>
+            <span class="fa fa-star checked" style="color: gold"></span>
         </div>
         <br>
         {% if authorized %}
             <div class="container">
                 <form method="post" action="/apartments/{{ apartment.id }}/reserve">
                     <label for="startDate">Reserve from</label>
-                    <input type="date" id="startDate" name="startDate" min="{{ apartment.availableFrom }}"
-                           style="margin: 10px; width: 200px" required readonly>
+                    <input type="date" id="startDate" name="startDate" style="margin: 10px;
+                     width: 200px;background: #262626" required
+                           readonly>
                     <label for="endDate">to</label>
-                    <input type="date" id="endDate" name="endDate" max="{{ apartment.availableTill }}"
-                           style="margin: 10px; width: 200px" required readonly>
+                    <input type="date" id="endDate" name="endDate" style="margin: 10px;
+                     width: 200px;background: #262626" required readonly>
                     <button class="btn btn-primary">Reserve</button>
                 </form>
             </div>
@@ -58,12 +59,13 @@
             <div class="container">
                 <form method="post" action="/apartments/{{ apartment.id }}/count">
                     <label for="startDate">Reserve from</label>
-                    <input type="date" id="startDate" name="startDate" min="{{ apartment.availableFrom }}"
-                           style="margin: 10px; width: 200px" required readonly>
+                    <input type="date" id="startDate" name="startDate" style="margin: 10px;
+                     width: 200px;background: #262626" required
+                           readonly>
                     <label for="endDate">to</label>
-                    <input type="date" id="endDate" name="endDate" max="{{ apartment.availableTill }}"
-                           style="margin: 10px; width: 200px" required readonly>
-                    <button type="submit">Calculate</button>
+                    <input type="date" id="endDate" name="endDate" style="margin: 10px;
+                     width: 200px;background: #262626" required readonly>
+                    <button type="submit" style="background: #1a1a1a">Calculate</button>
                     <br>
                 </form>
             </div>
@@ -79,35 +81,35 @@
 
                     <div class="btn-group">
                         <button type="submit" class="btn btn-outline-secondary" value="1" name="rate">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="gold"
                                  class="bi bi-star" viewBox="0 0 16 16">
                                 <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>
                             </svg>
                             <span class="visually-hidden"></span>
                         </button>
                         <button type="submit" class="btn btn-outline-secondary" value="2" name="rate">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="gold"
                                  class="bi bi-star" viewBox="0 0 16 16">
                                 <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>
                             </svg>
                             <span class="visually-hidden"></span>
                         </button>
                         <button type="submit" class="btn btn-outline-secondary" value="3" name="rate">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="gold"
                                  class="bi bi-star" viewBox="0 0 16 16">
                                 <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>
                             </svg>
                             <span class="visually-hidden"></span>
                         </button>
                         <button type="submit" class="btn btn-outline-secondary" value="4" name="rate">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="gold"
                                  class="bi bi-star" viewBox="0 0 16 16">
                                 <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>
                             </svg>
                             <span class="visually-hidden"></span>
                         </button>
                         <button type="submit" class="btn btn-outline-secondary" value="5" name="rate">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="gold"
                                  class="bi bi-star" viewBox="0 0 16 16">
                                 <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>
                             </svg>
@@ -147,7 +149,8 @@
                 <form method="post" action="/apartments/{{ apartment.id }}/addReview">
                     <div class="form-group">
                         <label for="review">Write review</label>
-                        <textarea id="review" class="form-control" name="review" placeholder="Review" rows="3"
+                        <textarea id="review" class="form-control" name="review" placeholder="Review"
+                                  style="background: #262626; color: gold" rows="3"
                                   cols="20" required></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">Add review</button>
@@ -155,19 +158,24 @@
             {% endif %}
         </div>
     </div>
-
-
 {% endblock %}
 {% block script %}
     <script>
-        dates = {{ reservationDates|json_encode()|raw }};
+        let dates = {{ reservationDates|json_encode()|raw }}
 
-            $('input').datepicker({
-                dateFormat: 'yy-mm-dd',
+            $(document).ready(function () {
+                $("input").datepicker({
+                    beforeShowDay: disableDates,
+                    dateFormat: "yy-mm-dd",
+                    minDate: {{ startDate|json_encode()|raw }},
+                    maxDate: {{ endDate|json_encode()|raw }},
+                    changeMonth: true,
+                    changeYear: true
+                });
 
-                beforeShowDay: function (date) {
-                    let string = jQuery.datepicker.formatDate('yy-mm-dd', date);
-                    return [dates.indexOf(string) === -1]
+                function disableDates(date) {
+                    let string = $.datepicker.formatDate('yy-mm-dd', date);
+                    return [dates.indexOf(string) == -1];
                 }
             });
     </script>

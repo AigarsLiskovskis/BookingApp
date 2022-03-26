@@ -5,7 +5,7 @@ namespace App\Models;
 
 class Apartment
 {
-    private int $id;
+    private ?int $id;
     private string $name;
     private string $address;
     private string $description;
@@ -16,14 +16,15 @@ class Apartment
 
     public function __construct
     (
-        int    $id,
+
         string $name,
         string $address,
         string $description,
         int    $userId,
         int    $price,
         string $availableFrom,
-        string $availableTill
+        string $availableTill,
+        ?int   $id = null
     )
 
     {

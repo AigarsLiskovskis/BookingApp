@@ -64,6 +64,5 @@ class User
         return $this->createdAt;
     }
 
-
 }
 

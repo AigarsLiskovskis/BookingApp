@@ -3,15 +3,15 @@
     <div class="container">
         {% for apartment in apartments %}
             <a href="/apartments/{{ apartment.id }}">
-                <div class="col-sm-4">
-                    <div class="panel panel-success">
-                        <div class="panel-heading">{{ apartment.name }}</div>
+                <div class="col-sm-4" style="color: whitesmoke">
+                    <div class="panel panel-success" style="background: #404040 ">
+                        <div class="panel-heading" style="background: darkgreen; color: lawngreen">{{ apartment.name }}</div>
                         <div class="panel-body">
                             <div>Address: {{ apartment.address }}</div>
                             <div>Available from: {{ apartment.availableFrom }}</div>
                             <div>Available till: {{ apartment.availableTill }}</div>
                         </div>
-                        <div class="panel-footer"></div>
+{#                        <div class="panel-footer" style="background: #333333"></div>#}
                     </div>
                 </div>
             </a>
